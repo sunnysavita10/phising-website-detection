@@ -5,7 +5,7 @@ from src.train_xgboost import train_xgboost
 from src.train_ann import train_ann
 
 def run_pipeline():
-    """_summary_
+    """pipeline to run the full ML workflow
     """
     # Load configuration
     config = load_config("config.yaml")
