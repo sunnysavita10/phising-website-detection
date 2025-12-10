@@ -5,39 +5,28 @@ from src.train_xgboost import train_xgboost
 from src.train_ann import train_ann
 
 def run_pipeline():
-    """pipeline to run the full ML workflow
-    """
-    # Load configuration
-    config = load_config("config.yaml")
+    config = load_config()
 
-    # Load dataset
-    df = load_dataset(config["data"]["path"])
+    df = load_dataset(config["data"]["file_path"])
 
-    # Preprocess data
     X_train, X_test, y_train, y_test = preprocess_data(
-    df=df,
-    target_col=config["data"]["target_column"],
-    test_size=config["data"]["test_size"],
-    random_state=config["data"]["random_state"],
-    scaler_path=f"{config['artifacts']['directory']}/{config['artifacts']['scaler_filename']}"
-   )
+        df=df,
+        target_col=config["data"]["target_column"],
+        test_size=config["data"]["test_size"],
+        random_state=config["data"]["random_state"],
+        scaler_path=f"{config['artifacts']['directory']}/{config['artifacts']['scaler_filename']}"
+    )
 
-    # Train XGBoost model
     train_xgboost(
-        X_train,
-        X_test,
-        y_train,
-        y_test,
-        config["xgboost"]["params"],
-        config["xgboost"]["save_path"],
+        X_train, X_test, y_train, y_test,
+        params=config["xgboost"],
+        save_path=f"{config['artifacts']['directory']}/{config['artifacts']['xgb_model_filename']}"
     )
 
-    # Train ANN model
     train_ann(
-        X_train,
-        X_test,
-        y_train,
-        y_test,
-        config["ann"]["params"],
-        config["ann"]["save_path"],
+        X_train, X_test, y_train, y_test,
+        params=config["mlp"],
+        save_path=f"{config['artifacts']['directory']}/{config['artifacts']['ann_model_filename']}"
     )
+
+    print("\n Pipeline Completed Successfully!")
