@@ -1,7 +1,6 @@
 import joblib
 import mlflow
 import mlflow.sklearn
-
 from sklearn.neural_network import MLPClassifier
 from sklearn.metrics import accuracy_score, classification_report
 from src.utils import print_header
