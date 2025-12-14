@@ -186,21 +186,18 @@ if __name__ == "__main__":
     #     "Statistical_report": 0
     # }
     from feature_extraction import FeatureExtractor
-    from inference.predictor import predict   # your existing ML predict()
 
     extractor = FeatureExtractor()
-
-    url = "https://secure-paypal-login-verification.xyz/login"
-
+    #url = "https://secure-paypal-login-verification.xyz/login"
+    #url = "http://google.com.secure-login.verify-account.example.com/"
+    url = "http://google.com/"
     features = extractor.extract(url)
+    # print("\nExtracted Features:")
+    # for k, v in features.items():
+    #     print(f"  {k}: {v}")
 
-    result = predict(features, model_type="xgboost")
+    print("\n--- XGBoost Prediction ---")
+    print(predict(features, model_type="xgboost"))
 
-    print(result)
-
-
-    # print("\n--- XGBoost Prediction ---")
-    # print(predict(sample_input, model_type="xgboost"))
-
-    # print("\n--- ANN (MLPClassifier) Prediction ---")
-    # print(predict(sample_input, model_type="ann"))
+    print("\n--- ANN (MLPClassifier) Prediction ---")
+    print(predict(features, model_type="ann"))

@@ -160,7 +160,8 @@ class FeatureExtractor:
         domain = parsed.hostname or ""
         html = self.fetch_html(url)
 
-        return {
+        features = {
+            # URL structure
             "having_IP_Address": self.having_ip_address(url),
             "URL_Length": self.url_length(url),
             "Shortining_Service": self.shortening_service(url),
@@ -169,20 +170,36 @@ class FeatureExtractor:
             "Prefix_Suffix": self.prefix_suffix(domain),
             "having_Sub_Domain": self.having_sub_domain(domain),
 
+            # Security
             "SSLfinal_State": self.ssl_final_state(url),
             "Domain_registeration_length": self.domain_registration_length(domain),
             "age_of_domain": self.age_of_domain(domain),
             "DNSRecord": self.dns_record(domain),
 
+            # HTML behavior
             "Request_URL": self.request_url(domain, html),
             "Submitting_to_email": self.submitting_to_email(html),
             "Abnormal_URL": self.abnormal_url(domain, html),
             "Iframe": self.iframe_present(html),
 
-            # Not reliable in real-time → unknown
+            # ========= DEFAULT / UNKNOWN FEATURES =========
+            "Favicon": -1,
+            "port": -1,
+            "HTTPS_token": -1,
+            "URL_of_Anchor": -1,
+            "Links_in_tags": -1,
+            "SFH": -1,
+            "Redirect": -1,
+            "on_mouseover": -1,
+            "RightClick": -1,
+            "popUpWidnow": -1,
             "web_traffic": -1,
             "Page_Rank": -1,
             "Google_Index": -1,
             "Links_pointing_to_page": -1,
             "Statistical_report": -1,
         }
+
+        return features
+
+        
