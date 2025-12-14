@@ -1,5 +1,3 @@
-'''pip install requests beautifulsoup4 tldextract dnspython python-whois'''
-
 '''
 URL
  ↓
@@ -11,7 +9,6 @@ Feature Extraction Functions
  ↓
 ML Model
 '''
-
 import socket
 import ssl
 import requests
