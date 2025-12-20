@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <title>PhishGuard AI — Phishing Website Detection</title>
+  <title>PhishGuard AI — Phishing Detection</title>
 
   <style>
     body {
@@ -12,191 +12,88 @@
       padding: 24px;
     }
 
-    h2 {
-      margin-bottom: 12px;
-      color: #111827;
-    }
-
     .container {
-      max-width: 980px;
+      max-width: 820px;
       margin: auto;
     }
 
     .card {
       background: #ffffff;
       border-radius: 14px;
-      padding: 22px;
+      padding: 24px;
       box-shadow: 0 10px 30px rgba(0,0,0,0.08);
     }
 
-    .row {
-      margin-bottom: 16px;
-    }
+    h2 { margin-bottom: 12px; }
 
-    label {
-      font-weight: 600;
-      color: #374151;
-    }
-
-    select {
-      padding: 6px 10px;
-      border-radius: 8px;
+    input {
+      width: 100%;
+      padding: 12px;
+      border-radius: 10px;
       border: 1px solid #c7d2fe;
-      background: #f9fafb;
+      font-size: 15px;
     }
 
-    .grid {
-      display: grid;
-      grid-template-columns: 1fr 160px;
-      gap: 12px;
-      margin-top: 10px;
-    }
-
-    fieldset {
-      border: 1px solid #e5e7eb;
-      border-radius: 12px;
-      padding: 14px;
-      margin-top: 18px;
-    }
-
-    legend {
-      padding: 6px 12px;
-      border-radius: 999px;
-      font-weight: bold;
-      font-size: 14px;
-    }
-
-    .url { background:#e0f2fe; color:#075985; }
-    .security { background:#dcfce7; color:#14532d; }
-    .trust { background:#fef9c3; color:#713f12; }
-    .behavior { background:#fee2e2; color:#7f1d1d; }
+    .row { margin-bottom: 18px; }
 
     .btn {
-      padding: 10px 18px;
+      padding: 12px 22px;
       border-radius: 10px;
       border: none;
       cursor: pointer;
       font-weight: bold;
-      margin-right: 8px;
+      background: #2563eb;
+      color: white;
     }
-
-    .btn.primary { background:#2563eb; color:#fff; }
-    .btn.legit { background:#16a34a; color:#fff; }
-    .btn.phish { background:#dc2626; color:#fff; }
-    .btn.reset { background:#6b7280; color:#fff; }
 
     .btn:hover { opacity: 0.9; }
 
     .result {
       margin-top: 22px;
-      padding: 16px;
-      background: #f3f4f6;
+      padding: 18px;
       border-radius: 12px;
+      background: #f3f4f6;
     }
 
     .tag {
       display: inline-block;
-      padding: 4px 10px;
+      padding: 6px 12px;
       border-radius: 999px;
-      font-size: 13px;
       font-weight: bold;
-      margin-left: 6px;
+      margin-left: 8px;
     }
 
-    .tag-legit { background:#dcfce7; color:#166534; }
-    .tag-phish { background:#fee2e2; color:#991b1b; }
+    .legit { background:#dcfce7; color:#166534; }
+    .phish { background:#fee2e2; color:#991b1b; }
   </style>
 </head>
 
 <body>
 <div class="container">
-
-  <h2>🛡️ PhishGuard AI — Real-time Phishing Website Detection</h2>
+  <h2>🛡️ PhishGuard AI — Real-Time Phishing Detection</h2>
 
   <div class="card">
     <form method="post" action="/predict">
 
-      <!-- MODEL -->
       <div class="row">
-        <label>Model</label><br />
+        <label><b>Website URL</b></label><br />
+        <input
+          name="url"
+          placeholder="https://example.com/login"
+          value="{{ url or '' }}"
+          required
+        />
+      </div>
+
+      <div class="row">
+        <label><b>Model</b></label><br />
         <select name="model_type">
           <option value="xgboost">XGBoost</option>
-          <option value="ann">ANN (MLPClassifier)</option>
+          <option value="ann">ANN (MLP)</option>
         </select>
       </div>
 
-      <!-- PRESETS -->
-      <div class="row">
-        <button type="button" class="btn legit" onclick="fillLegit()">✔ Likely Legit</button>
-        <button type="button" class="btn phish" onclick="fillPhish()">⚠ Likely Phishing</button>
-        <button type="button" class="btn reset" onclick="resetAll()">↺ Reset</button>
-      </div>
-
-      <!-- URL STRUCTURE -->
-      <fieldset>
-        <legend class="url">🔐 URL Structure</legend>
-        <div class="grid">
-          {% for f in ["having_IP_Address","URL_Length","Shortining_Service","having_At_Symbol","double_slash_redirecting","Prefix_Suffix","having_Sub_Domain"] %}
-            <label>{{ f.replace("_"," ") }}</label>
-            <select name="{{f}}">
-              <option value="unknown">Unknown</option>
-              <option value="yes">Yes</option>
-              <option value="no">No</option>
-            </select>
-          {% endfor %}
-        </div>
-      </fieldset>
-
-      <!-- SECURITY -->
-      <fieldset>
-        <legend class="security">🔒 Security & SSL</legend>
-        <div class="grid">
-          {% for f in ["SSLfinal_State","HTTPS_token","port","DNSRecord"] %}
-            <label>{{ f.replace("_"," ") }}</label>
-            <select name="{{f}}">
-              <option value="unknown">Unknown</option>
-              <option value="yes">Yes</option>
-              <option value="no">No</option>
-            </select>
-          {% endfor %}
-        </div>
-      </fieldset>
-
-      <!-- DOMAIN TRUST -->
-      <fieldset>
-        <legend class="trust">🌐 Domain Trust & Reputation</legend>
-        <div class="grid">
-          {% for f in ["Domain_registeration_length","age_of_domain","Google_Index","Page_Rank","web_traffic","Links_pointing_to_page","Statistical_report"] %}
-            <label>{{ f.replace("_"," ") }}</label>
-            <select name="{{f}}">
-              <option value="unknown">Unknown</option>
-              <option value="yes">Yes</option>
-              <option value="no">No</option>
-            </select>
-          {% endfor %}
-        </div>
-      </fieldset>
-
-      <!-- BEHAVIOR -->
-      <fieldset>
-        <legend class="behavior">🚨 Suspicious Page Behavior</legend>
-        <div class="grid">
-          {% for f in ["Request_URL","URL_of_Anchor","Links_in_tags","SFH","Submitting_to_email","Abnormal_URL","Redirect","on_mouseover","RightClick","popUpWidnow","Iframe"] %}
-            <label>{{ f.replace("_"," ") }}</label>
-            <select name="{{f}}">
-              <option value="unknown">Unknown</option>
-              <option value="yes">Yes</option>
-              <option value="no">No</option>
-            </select>
-          {% endfor %}
-        </div>
-      </fieldset>
-
-      <!-- SUBMIT -->
-      <div class="row" style="margin-top:22px;">
-        <button type="submit" class="btn primary">Predict Website Risk</button>
-      </div>
-
+      <button class="btn" type="submit">Analyze Website</button>
     </form>
 
     {% if result %}
@@ -204,65 +101,19 @@
         <h3>Prediction Result</h3>
         <p><b>Model:</b> {{ result["model"] }}</p>
         <p>
-          <b>Prediction:</b> {{ result["result_text"] }}
+          <b>Result:</b> {{ result["result_text"] }}
           {% if result["prediction"] == 1 %}
-            <span class="tag tag-legit">LEGIT</span>
+            <span class="tag legit">LEGIT</span>
           {% else %}
-            <span class="tag tag-phish">PHISHING</span>
+            <span class="tag phish">PHISHING</span>
           {% endif %}
         </p>
+        {% if result["phishing_probability"] is not none %}
+          <p><b>Phishing Probability:</b> {{ "%.2f"|format(result["phishing_probability"]*100) }}%</p>
+        {% endif %}
       </div>
     {% endif %}
-
   </div>
 </div>
-
-<!-- PRESET JS -->
-<script>
-  function applyPreset(preset) {
-    document.querySelectorAll("select").forEach(el => {
-      if (preset[el.name]) el.value = preset[el.name];
-      else if (el.name !== "model_type") el.value = "unknown";
-    });
-  }
-
-  function fillLegit() {
-    applyPreset({
-      having_IP_Address:"no",
-      Shortining_Service:"no",
-      SSLfinal_State:"yes",
-      HTTPS_token:"no",
-      Domain_registeration_length:"yes",
-      age_of_domain:"yes",
-      Google_Index:"yes",
-      Page_Rank:"yes",
-      DNSRecord:"yes",
-      Abnormal_URL:"no",
-      Iframe:"no"
-    });
-  }
-
-  function fillPhish() {
-    applyPreset({
-      having_IP_Address:"yes",
-      Shortining_Service:"yes",
-      HTTPS_token:"yes",
-      Submitting_to_email:"yes",
-      Abnormal_URL:"yes",
-      Iframe:"yes",
-      Redirect:"yes",
-      DNSRecord:"no",
-      SSLfinal_State:"no"
-    });
-  }
-
-  function resetAll() {
-    document.querySelectorAll("select").forEach(el=>{
-      if(el.name!=="model_type") el.value="unknown";
-    });
-  }
-</script>
-
 </body>
 </html>
-
