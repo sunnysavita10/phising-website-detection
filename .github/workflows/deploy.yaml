@@ -1,4 +1,4 @@
-name: Deploy to AWS App Runner
+name: Deploy to AWS App Runner (Verbose)
 
 on:
   push:
@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout code
+    - name: Checkout repository
       uses: actions/checkout@v4
 
     - name: Configure AWS credentials
@@ -20,17 +20,36 @@ jobs:
         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         aws-region: ${{ secrets.AWS_REGION }}
 
+    - name: Verify AWS identity
+      run: |
+        echo "Verifying AWS identity..."
+        aws sts get-caller-identity
+
     - name: Login to Amazon ECR
       uses: aws-actions/amazon-ecr-login@v2
 
+    - name: Docker version
+      run: docker --version
+
     - name: Build Docker image
       run: |
-        docker build -t my-fastapi-app .
+        echo "Starting Docker build..."
+        docker build \
+          --progress=plain \
+          -t my-fastapi-app .
+
+        echo "Docker image built successfully"
+        docker images | grep my-fastapi-app
 
     - name: Tag Docker image
       run: |
+        echo "Tagging Docker image..."
         docker tag my-fastapi-app:latest ${{ secrets.ECR_REPO }}:latest
+        docker images | grep my-fastapi-app
 
     - name: Push image to ECR
       run: |
+        echo "▶ Pushing image to ECR..."
         docker push ${{ secrets.ECR_REPO }}:latest
+
+        echo "▶ Image pushed successfully"
